@@ -1,52 +1,89 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const Input = ({ label, type = 'text', name, value, onChange, error, placeholder, required = false, options = [] }) => {
+    const [isFocused, setIsFocused] = useState(false);
+
     return (
-        <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-dark)' }}>
+        <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{
+                display: 'block',
+                marginBottom: '0.5rem',
+                fontWeight: '500',
+                color: 'var(--text-dark)',
+                fontSize: '0.95rem'
+            }}>
                 {label} {required && <span style={{ color: 'var(--error)' }}>*</span>}
             </label>
 
-            {type === 'select' ? (
-                <select
-                    name={name}
-                    value={value}
-                    onChange={onChange}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: 'var(--border-radius)',
-                        border: `1px solid ${error ? 'var(--error)' : '#ccc'}`,
-                        fontFamily: 'inherit',
-                        fontSize: '1rem'
-                    }}
-                >
-                    <option value="">Select {label}</option>
-                    {options.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                        </option>
-                    ))}
-                </select>
-            ) : (
-                <input
-                    type={type}
-                    name={name}
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: 'var(--border-radius)',
-                        border: `1px solid ${error ? 'var(--error)' : '#ccc'}`,
-                        fontFamily: 'inherit',
-                        fontSize: '1rem'
-                    }}
-                />
-            )}
+            <div style={{ position: 'relative' }}>
+                {type === 'select' ? (
+                    <motion.select
+                        name={name}
+                        value={value}
+                        onChange={onChange}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        animate={isFocused ? { borderColor: 'var(--primary-color)', boxShadow: '0 0 0 3px rgba(0, 135, 83, 0.1)' } : { borderColor: error ? 'var(--error)' : '#cbd5e1', boxShadow: 'none' }}
+                        style={{
+                            width: '100%',
+                            padding: '14px 16px',
+                            borderRadius: 'var(--border-radius)',
+                            border: `1px solid ${error ? 'var(--error)' : '#cbd5e1'}`,
+                            fontFamily: 'inherit',
+                            fontSize: '1rem',
+                            outline: 'none',
+                            backgroundColor: 'white',
+                            appearance: 'none',
+                            cursor: 'pointer',
+                            backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23008753%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 16px top 50%',
+                            backgroundSize: '12px auto'
+                        }}
+                    >
+                        <option value="">Select Option...</option>
+                        {options.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </option>
+                        ))}
+                    </motion.select>
+                ) : (
+                    <motion.input
+                        type={type}
+                        name={name}
+                        value={value}
+                        onChange={onChange}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        placeholder={placeholder}
+                        animate={isFocused ? { borderColor: 'var(--primary-color)', boxShadow: '0 0 0 3px rgba(0, 135, 83, 0.1)' } : { borderColor: error ? 'var(--error)' : '#cbd5e1', boxShadow: 'none' }}
+                        transition={{ duration: 0.2 }}
+                        style={{
+                            width: '100%',
+                            padding: '14px 16px',
+                            borderRadius: 'var(--border-radius)',
+                            border: `1px solid ${error ? 'var(--error)' : '#cbd5e1'}`,
+                            fontFamily: 'inherit',
+                            fontSize: '1rem',
+                            outline: 'none',
+                            color: 'var(--text-dark)',
+                            backgroundColor: 'white'
+                        }}
+                    />
+                )}
+            </div>
 
-            {error && <span style={{ color: 'var(--error)', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block' }}>{error}</span>}
+            {error && (
+                <motion.span
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ color: 'var(--error)', fontSize: '0.85rem', marginTop: '0.5rem', display: 'block', fontWeight: '500' }}
+                >
+                    {error}
+                </motion.span>
+            )}
         </div>
     );
 };

@@ -1,57 +1,79 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ShieldCheck, Shield, Users, CheckCircle } from 'lucide-react';
 
 const LandingPage = () => {
     return (
-        <div className="landing-page" style={{ padding: '4rem 0', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '1rem', right: '2rem' }}>
+        <div className="landing-page" style={{
+            minHeight: '100vh',
+            position: 'relative',
+            overflow: 'hidden',
+            paddingTop: '80px',
+            paddingBottom: '80px',
+            backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(0, 135, 83, 0.05) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(0, 135, 83, 0.05) 0%, transparent 20%)'
+        }}>
+            {/* Background Decor */}
+            <div style={{ position: 'absolute', top: -100, right: -100, width: 400, height: 400, borderRadius: '50%', background: 'linear-gradient(135deg, rgba(0,135,83,0.1), rgba(212,244,221,0.3))', filter: 'blur(80px)', zIndex: -1 }} />
+            <div style={{ position: 'absolute', bottom: -50, left: -50, width: 300, height: 300, borderRadius: '50%', background: 'linear-gradient(135deg, rgba(0,135,83,0.05), rgba(212,244,221,0.2))', filter: 'blur(60px)', zIndex: -1 }} />
+
+            <div style={{ position: 'absolute', top: '1.5rem', right: '2rem', zIndex: 10 }}>
                 <Link to="/login" className="btn" style={{
-                    padding: '8px 16px',
-                    fontSize: '0.85rem',
-                    backgroundColor: 'rgba(0, 135, 83, 0.1)',
+                    padding: '10px 20px',
+                    fontSize: '0.9rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
                     color: 'var(--primary-color)',
-                    border: '1px solid var(--primary-color)'
+                    border: '1px solid var(--primary-light)',
+                    backdropFilter: 'blur(8px)',
+                    boxShadow: 'var(--shadow-sm)'
                 }}>
                     Admin Login
                 </Link>
             </div>
-            <div className="container" style={{ textAlign: 'center' }}>
+
+            <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
 
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                     <div style={{
-                        width: '80px',
-                        height: '80px',
-                        backgroundColor: 'var(--primary-color)',
-                        borderRadius: '50%',
-                        margin: '0 auto 1.5rem',
+                        width: '100px',
+                        height: '100px',
+                        backgroundColor: 'var(--white)',
+                        borderRadius: '30%', /* Soft square */
+                        margin: '0 auto 2rem',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        boxShadow: 'var(--shadow-glow)',
+                        transform: 'rotate(-5deg)'
                     }}>
-                        {/* Simple Coat of Arms or Shield Icon placeholder */}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg>
+                        <ShieldCheck size={56} color="var(--primary-color)" />
                     </div>
 
-                    <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>
-                        National Civic Engagement Portal
+                    <h1 style={{
+                        fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                        marginBottom: '1.5rem',
+                        color: 'var(--text-dark)',
+                        fontWeight: '700',
+                        letterSpacing: '-1px',
+                        lineHeight: '1.1'
+                    }}>
+                        National <span className="text-primary">Civic Engagement</span> Portal
                     </h1>
 
                     <p style={{
-                        fontSize: '1.2rem',
-                        color: 'var(--text-light)',
+                        fontSize: '1.25rem',
+                        color: 'var(--text-gray)',
                         maxWidth: '700px',
-                        margin: '0 auto 2.5rem',
-                        lineHeight: '1.8'
+                        margin: '0 auto 3rem',
+                        lineHeight: '1.8',
+                        fontWeight: '300'
                     }}>
-                        A secure, unified platform for citizens to register their details for civic engagement and support.
-                        This initiative ensures that every citizen, regardless of PVC status, is accounted for.
+                        A secure, unified platform for citizens to register their details for civic engagement.
+                        Ensuring that every citizen, regardless of status, is accounted for.
                     </p>
 
                     <div style={{
@@ -59,67 +81,72 @@ const LandingPage = () => {
                         gap: '1.5rem',
                         justifyContent: 'center',
                         flexWrap: 'wrap',
-                        marginBottom: '3rem'
+                        marginBottom: '5rem'
                     }}>
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                            <Link to="/register" className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem' }}>
+                        <Link to="/register">
+                            <motion.button
+                                className="btn btn-primary"
+                                style={{ padding: '16px 40px', fontSize: '1.1rem', borderRadius: '50px' }}
+                                whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(0, 135, 83, 0.3)" }}
+                                whileTap={{ scale: 0.95 }}
+                            >
                                 Register Your Details
-                            </Link>
-                        </motion.div>
+                            </motion.button>
+                        </Link>
                     </div>
 
-                    <div style={{
-                        borderTop: '1px solid #eee',
-                        paddingTop: '3rem',
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                        gap: '2rem',
-                        textAlign: 'left'
-                    }}>
+                    <div className="grid-responsive" style={{ textAlign: 'left' }}>
                         <InfoCard
+                            icon={<Shield size={32} color="var(--primary-color)" />}
                             title="Secure Data"
-                            desc="Your information is encrypted and securely stored. We prioritize your privacy and data protection."
+                            desc="Your information is encrypted using bank-grade security protocols. We prioritize your privacy and data protection above all else."
                             delay={0.2}
                         />
                         <InfoCard
+                            icon={<Users size={32} color="var(--primary-color)" />}
                             title="Civic Inclusion"
                             desc="Ensuring every voice is heard. If you do not have a PVC, your registration helps us understand engagement needs."
                             delay={0.3}
                         />
                         <InfoCard
-                            title="Institutional Trust"
-                            desc="Managed by the GMT Board with strict oversight and verified administrative access."
+                            icon={<CheckCircle size={32} color="var(--primary-color)" />}
+                            title="Verified Trust"
+                            desc="Managed by the GMT Board with strict oversight and verified administrative access for data integrity."
                             delay={0.4}
                         />
                     </div>
-
-                    <div style={{ marginTop: '4rem', opacity: 0.7 }}>
-                        <Link to="/login" style={{ fontSize: '0.9rem', color: '#999', textDecoration: 'underline' }}>
-                            Authorized Officer Login
-                        </Link>
-                    </div>
-
                 </motion.div>
             </div>
         </div>
     );
 };
 
-const InfoCard = ({ title, desc, delay }) => (
+const InfoCard = ({ icon, title, desc, delay }) => (
     <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ delay, duration: 0.5 }}
+        transition={{ delay, duration: 0.6 }}
+        className="glass"
         style={{
-            padding: '1.5rem',
-            backgroundColor: 'var(--white)',
-            borderRadius: 'var(--border-radius)',
-            border: '1px solid #eaeaea'
+            padding: '2.5rem',
+            borderRadius: '24px',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'var(--transition)'
         }}
+        whileHover={{ y: -10, boxShadow: 'var(--shadow-lg)' }}
     >
-        <h3 style={{ color: 'var(--primary-color)', marginBottom: '0.5rem' }}>{title}</h3>
-        <p style={{ fontSize: '0.95rem', color: 'var(--text-light)' }}>{desc}</p>
+        <div style={{
+            width: '60px', height: '60px',
+            borderRadius: '16px',
+            backgroundColor: 'var(--primary-light)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: '1.5rem'
+        }}>
+            {icon}
+        </div>
+        <h3 style={{ color: 'var(--text-dark)', marginBottom: '1rem', fontSize: '1.4rem' }}>{title}</h3>
+        <p style={{ fontSize: '1rem', color: 'var(--text-gray)', lineHeight: '1.7' }}>{desc}</p>
     </motion.div>
 );
 

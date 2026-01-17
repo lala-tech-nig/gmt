@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import Input from '../components/Input';
 import CameraCapture from '../components/CameraCapture';
+import AnimatedButton from '../components/AnimatedButton';
 
-const STEPS = ['Personal Data', 'Contact Info', 'Address', 'Identity Details', 'Emergency Contact'];
+const STEPS = ['Personal Data', 'Contact Info', 'Address', 'Identity', 'Emergency'];
 
 const RegistrationPage = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '', middleName: '', surname: '',
         nationality: 'Nigerian', hometown: '', lgaOfOrigin: '', stateOfOrigin: '',
@@ -17,7 +20,7 @@ const RegistrationPage = () => {
         phone: '', isWhatsApp: false, email: '',
         houseNumber: '', streetName: '', city: '', residenceLga: '', residenceState: '',
         pvcStatus: '', nin: '',
-        imageData: null, // Base64 image
+        imageData: null,
         emergencyName: '', emergencyRel: '', emergencyPhone: ''
     });
     const [errors, setErrors] = useState({});
@@ -75,14 +78,9 @@ const RegistrationPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateStep(currentStep)) {
+            setIsSubmitting(true);
             try {
-                console.log('Submitting Form:', formData);
-
                 // Prepare payload
-                // We can send JSON since our backend handles base64 in 'imageData'
-                // But if we had a real file object, we'd use FormData.
-                // Since CameraCapture returns base64, JSON is easiest.
-
                 const response = await axios.post('https://gmt-b7oh.onrender.com/api/public/register', formData);
 
                 if (response.data.success) {
@@ -91,121 +89,173 @@ const RegistrationPage = () => {
             } catch (err) {
                 console.error('Registration Error:', err);
                 alert(err.response?.data?.message || 'Registration failed. Please try again.');
+            } finally {
+                setIsSubmitting(false);
             }
         }
     };
 
     return (
-        <div className="registration-page" style={{ maxWidth: '600px', margin: '0 auto' }}>
-            <h1 className="text-center" style={{ color: 'var(--primary-color)', marginBottom: '2rem' }}>Citizen Registration</h1>
+        <div className="registration-page" style={{
+            minHeight: '100vh',
+            padding: '2rem 1rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        }}>
+            <h1 className="text-center" style={{
+                color: 'var(--primary-color)',
+                marginBottom: '2rem',
+                fontSize: '1.75rem',
+                fontWeight: '700'
+            }}>Citizen Registration</h1>
 
-            {/* Progress Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                {STEPS.map((step, index) => (
-                    <div key={index} style={{
-                        flex: 1,
-                        height: '4px',
-                        backgroundColor: index <= currentStep ? 'var(--primary-color)' : '#e0e0e0',
-                        margin: '0 4px',
-                        borderRadius: '2px'
-                    }} />
-                ))}
+            <div style={{ width: '100%', maxWidth: '600px', marginBottom: '2rem' }}>
+                {/* Progress Bar */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', position: 'relative' }}>
+                    {STEPS.map((step, idx) => (
+                        <div key={idx} style={{
+                            flex: 1,
+                            textAlign: 'center',
+                            fontSize: '0.75rem',
+                            color: idx <= currentStep ? 'var(--primary-color)' : '#999',
+                            fontWeight: idx === currentStep ? 'bold' : 'normal'
+                        }}>
+                            {idx + 1}
+                        </div>
+                    ))}
+                </div>
+                <div style={{ height: '6px', width: '100%', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                    <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+                        transition={{ duration: 0.3 }}
+                        style={{ height: '100%', backgroundColor: 'var(--primary-color)' }}
+                    />
+                </div>
+                <p className="text-center" style={{ marginTop: '0.5rem', color: 'var(--text-gray)', fontSize: '0.9rem' }}>
+                    {STEPS[currentStep]}
+                </p>
             </div>
-            <p className="text-center" style={{ marginBottom: '2rem', color: 'var(--text-light)' }}>
-                Step {currentStep + 1} of {STEPS.length}: {STEPS[currentStep]}
-            </p>
 
             <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="card"
+                layout
+                className="card glass"
+                style={{ width: '100%', maxWidth: '600px', padding: '2rem', borderRadius: '24px' }}
             >
                 <form onSubmit={handleSubmit}>
-                    {currentStep === 0 && (
-                        <>
-                            <Input label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} error={errors.firstName} required />
-                            <Input label="Middle Name" name="middleName" value={formData.middleName} onChange={handleChange} />
-                            <Input label="Surname" name="surname" value={formData.surname} onChange={handleChange} error={errors.surname} required />
-                            <Input label="Nationality" name="nationality" value={formData.nationality} onChange={handleChange} />
-                            <Input label="Hometown" name="hometown" value={formData.hometown} onChange={handleChange} />
-                            <Input label="LGA of Origin" name="lgaOfOrigin" value={formData.lgaOfOrigin} onChange={handleChange} />
-                            <Input label="State of Origin" name="stateOfOrigin" value={formData.stateOfOrigin} onChange={handleChange} />
-                            <Input label="Date of Birth" type="date" name="dob" value={formData.dob} onChange={handleChange} error={errors.dob} required />
-                            <Input label="Religion" type="select" name="religion" value={formData.religion} onChange={handleChange} options={[
-                                { value: 'Christianity', label: 'Christianity' },
-                                { value: 'Islam', label: 'Islam' },
-                                { value: 'Traditional', label: 'Traditional' },
-                                { value: 'Other', label: 'Other' }
-                            ]} />
-                            <Input label="Gender" type="select" name="gender" value={formData.gender} onChange={handleChange} options={[
-                                { value: 'Male', label: 'Male' },
-                                { value: 'Female', label: 'Female' },
-                                { value: 'Other', label: 'Other' }
-                            ]} error={errors.gender} required />
-                        </>
-                    )}
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentStep}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {currentStep === 0 && (
+                                <div className="grid-responsive" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <Input label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} error={errors.firstName} required />
+                                    <Input label="Surname" name="surname" value={formData.surname} onChange={handleChange} error={errors.surname} required />
+                                    <Input label="Middle Name" name="middleName" value={formData.middleName} onChange={handleChange} />
+                                    <Input label="Gender" type="select" name="gender" value={formData.gender} onChange={handleChange} options={[
+                                        { value: 'Male', label: 'Male' },
+                                        { value: 'Female', label: 'Female' },
+                                        { value: 'Other', label: 'Other' }
+                                    ]} error={errors.gender} required />
+                                    <Input label="Date of Birth" type="date" name="dob" value={formData.dob} onChange={handleChange} error={errors.dob} required />
+                                    <Input label="Nationality" name="nationality" value={formData.nationality} onChange={handleChange} />
+                                    <Input label="State of Origin" name="stateOfOrigin" value={formData.stateOfOrigin} onChange={handleChange} />
+                                    <Input label="LGA of Origin" name="lgaOfOrigin" value={formData.lgaOfOrigin} onChange={handleChange} />
+                                    <Input label="Hometown" name="hometown" value={formData.hometown} onChange={handleChange} />
+                                    <Input label="Religion" type="select" name="religion" value={formData.religion} onChange={handleChange} options={[
+                                        { value: 'Christianity', label: 'Christianity' },
+                                        { value: 'Islam', label: 'Islam' },
+                                        { value: 'Traditional', label: 'Traditional' },
+                                        { value: 'Other', label: 'Other' }
+                                    ]} />
+                                </div>
+                            )}
 
-                    {currentStep === 1 && (
-                        <>
-                            <Input label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} error={errors.phone} required />
-                            <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <input type="checkbox" name="isWhatsApp" checked={formData.isWhatsApp} onChange={handleChange} />
-                                <label>This is also my WhatsApp number</label>
-                            </div>
-                            <Input label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} />
-                        </>
-                    )}
+                            {currentStep === 1 && (
+                                <div>
+                                    <Input label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} error={errors.phone} required placeholder="080..." />
+                                    <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <input
+                                            type="checkbox"
+                                            name="isWhatsApp"
+                                            checked={formData.isWhatsApp}
+                                            onChange={handleChange}
+                                            style={{ width: '18px', height: '18px', accentColor: 'var(--primary-color)' }}
+                                        />
+                                        <label style={{ fontSize: '0.95rem' }}>This is also my WhatsApp number</label>
+                                    </div>
+                                    <Input label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="example@email.com" />
+                                </div>
+                            )}
 
-                    {currentStep === 2 && (
-                        <>
-                            <Input label="House Number" name="houseNumber" value={formData.houseNumber} onChange={handleChange} error={errors.houseNumber} required />
-                            <Input label="Street Name" name="streetName" value={formData.streetName} onChange={handleChange} error={errors.streetName} required />
-                            <Input label="City / Town" name="city" value={formData.city} onChange={handleChange} error={errors.city} required />
-                            <Input label="LGA of Residence" name="residenceLga" value={formData.residenceLga} onChange={handleChange} />
-                            <Input label="State" name="residenceState" value={formData.residenceState} onChange={handleChange} error={errors.residenceState} required />
-                        </>
-                    )}
+                            {currentStep === 2 && (
+                                <div>
+                                    <Input label="House Number" name="houseNumber" value={formData.houseNumber} onChange={handleChange} error={errors.houseNumber} required />
+                                    <Input label="Street Name" name="streetName" value={formData.streetName} onChange={handleChange} error={errors.streetName} required />
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <Input label="City / Town" name="city" value={formData.city} onChange={handleChange} error={errors.city} required />
+                                        <Input label="State (Residence)" name="residenceState" value={formData.residenceState} onChange={handleChange} error={errors.residenceState} required />
+                                    </div>
+                                    <Input label="LGA of Residence" name="residenceLga" value={formData.residenceLga} onChange={handleChange} />
+                                </div>
+                            )}
 
-                    {currentStep === 3 && (
-                        <>
-                            <Input label="Do you have a PVC?" type="select" name="pvcStatus" value={formData.pvcStatus} onChange={handleChange} options={[
-                                { value: 'YES', label: 'Yes' },
-                                { value: 'NO', label: 'No' }
-                            ]} error={errors.pvcStatus} required />
+                            {currentStep === 3 && (
+                                <div>
+                                    <Input label="Do you have a PVC?" type="select" name="pvcStatus" value={formData.pvcStatus} onChange={handleChange} options={[
+                                        { value: 'YES', label: 'Yes, I have my PVC' },
+                                        { value: 'NO', label: 'No, I don\'t have one' }
+                                    ]} error={errors.pvcStatus} required />
 
-                            <Input label="NIN (11 Digits)" name="nin" value={formData.nin} onChange={handleChange} placeholder="___________" error={errors.nin} required />
+                                    <Input label="NIN (11 Digits)" name="nin" value={formData.nin} onChange={handleChange} placeholder="12345678901" error={errors.nin} required />
 
-                            <CameraCapture label="Take a Photo / Upload Image" onCapture={handleImageCapture} />
-                            {errors.imageData && <div style={{ color: 'var(--error)', fontSize: '0.85rem' }}>{errors.imageData}</div>}
-                        </>
-                    )}
+                                    <div style={{ marginTop: '2rem' }}>
+                                        <CameraCapture label="Take a Photo / Upload Image" onCapture={handleImageCapture} />
+                                        {errors.imageData && <div style={{ color: 'var(--error)', fontSize: '0.85rem' }}>{errors.imageData}</div>}
+                                    </div>
+                                </div>
+                            )}
 
-                    {currentStep === 4 && (
-                        <>
-                            <Input label="Emergency Contact Name" name="emergencyName" value={formData.emergencyName} onChange={handleChange} />
-                            <Input label="Relationship" name="emergencyRel" value={formData.emergencyRel} onChange={handleChange} />
-                            <Input label="Contact Number" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} />
-                        </>
-                    )}
+                            {currentStep === 4 && (
+                                <div>
+                                    <h3 style={{ marginBottom: '1rem', color: 'var(--text-gray)', fontSize: '1.1rem' }}>Emergency Contact</h3>
+                                    <Input label="Full Name" name="emergencyName" value={formData.emergencyName} onChange={handleChange} />
+                                    <Input label="Relationship" name="emergencyRel" value={formData.emergencyRel} onChange={handleChange} placeholder="e.g. Brother, Wife" />
+                                    <Input label="Contact Number" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} />
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
 
                     {/* Navigation Buttons */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
-                        {currentStep > 0 && (
-                            <button type="button" onClick={handleBack} className="btn" style={{ backgroundColor: '#e0e0e0' }}>
-                                Back
-                            </button>
-                        )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
+                        {currentStep > 0 ? (
+                            <AnimatedButton
+                                onClick={handleBack}
+                                className="btn"
+                                style={{ backgroundColor: '#f1f5f9', color: 'var(--text-dark)' }}
+                            >
+                                <ChevronLeft size={18} /> Back
+                            </AnimatedButton>
+                        ) : <div></div>}
+
                         {currentStep < STEPS.length - 1 ? (
-                            <button type="button" onClick={handleNext} className="btn btn-primary" style={{ marginLeft: 'auto' }}>
-                                Next Step
-                            </button>
+                            <AnimatedButton onClick={handleNext}>
+                                Next Step <ChevronRight size={18} />
+                            </AnimatedButton>
                         ) : (
-                            <button type="submit" className="btn btn-primary" style={{ marginLeft: 'auto' }}>
-                                Submit Registration
-                            </button>
+                            <AnimatedButton
+                                type="submit"
+                                isLoading={isSubmitting}
+                                onClick={handleSubmit}
+                            >
+                                <Check size={18} /> Submit Registration
+                            </AnimatedButton>
                         )}
                     </div>
                 </form>
