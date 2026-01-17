@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://gmt-b7oh.onrender.com',
         changeOrigin: true,
         secure: false,
       },
