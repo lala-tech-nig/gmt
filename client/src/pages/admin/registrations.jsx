@@ -14,7 +14,7 @@ const RegisteredUsersPage = () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('/api/admin/registrations', {
+                const res = await axios.get('https://gmt-b7oh.onrender.com/api/admin/registrations', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (res.data.success) {

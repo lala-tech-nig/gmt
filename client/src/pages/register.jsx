@@ -83,7 +83,7 @@ const RegistrationPage = () => {
                 // But if we had a real file object, we'd use FormData.
                 // Since CameraCapture returns base64, JSON is easiest.
 
-                const response = await axios.post('/api/public/register', formData);
+                const response = await axios.post('https://gmt-b7oh.onrender.com/api/public/register', formData);
 
                 if (response.data.success) {
                     navigate('/success');

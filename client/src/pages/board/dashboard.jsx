@@ -10,7 +10,7 @@ const BoardDashboardPage = () => {
         const fetchStats = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('/api/admin/stats', {
+                const res = await axios.get('https://gmt-b7oh.onrender.com/api/admin/stats', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (res.data.success) {

@@ -21,7 +21,7 @@ const UploadPage = () => {
     setUploading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('/api/admin/upload-nins', formData, {
+      const res = await axios.post('https://gmt-b7oh.onrender.com/api/admin/upload-nins', formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

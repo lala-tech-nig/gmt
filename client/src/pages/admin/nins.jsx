@@ -17,7 +17,7 @@ const NINViewerPage = () => {
                 const params = {};
                 if (filter !== 'ALL') params.pvcStatus = filter;
 
-                const res = await axios.get('/api/admin/citizens', {
+                const res = await axios.get('https://gmt-b7oh.onrender.com/api/admin/citizens', {
                     headers: { Authorization: `Bearer ${token}` },
                     params
                 });

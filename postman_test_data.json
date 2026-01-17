@@ -1,0 +1,46 @@
+[
+    {
+        "description": "Create Super Admin",
+        "url": "http://localhost:5000/api/auth/seed",
+        "method": "POST",
+        "body": {
+            "name": "Super Admin",
+            "email": "superadmin@gmt.ng",
+            "password": "password123",
+            "role": "admin"
+        }
+    },
+    {
+        "description": "Create Board Member",
+        "url": "http://localhost:5000/api/auth/seed",
+        "method": "POST",
+        "body": {
+            "name": "GMT Board Member",
+            "email": "board@gmt.ng",
+            "password": "password123",
+            "role": "board"
+        }
+    },
+    {
+        "description": "Create Upload Officer",
+        "url": "http://localhost:5000/api/auth/seed",
+        "method": "POST",
+        "body": {
+            "name": "Upload Officer",
+            "email": "upload@gmt.ng",
+            "password": "password123",
+            "role": "officer_upload"
+        }
+    },
+    {
+        "description": "Create Read-Only Officer",
+        "url": "http://localhost:5000/api/auth/seed",
+        "method": "POST",
+        "body": {
+            "name": "Viewer Officer",
+            "email": "viewer@gmt.ng",
+            "password": "password123",
+            "role": "officer_read"
+        }
+    }
+]
