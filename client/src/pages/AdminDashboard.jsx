@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, Users, Phone, BarChart } from 'lucide-react';
+import { Upload, Users, Phone, BarChart, UserCheck } from 'lucide-react';
 
 const AdminDashboard = () => {
     // TODO: Check for auth/role in real implementation
@@ -21,10 +21,16 @@ const AdminDashboard = () => {
                     desc="Sort and classify bulk NIN records."
                 />
                 <DashboardCard
+                    to="/admin/registrations"
+                    icon={<UserCheck size={32} />}
+                    title="Online Registrations"
+                    desc="View citizens registered via portal."
+                />
+                <DashboardCard
                     to="/admin/nins"
                     icon={<Users size={32} />}
                     title="NIN Viewer"
-                    desc="Read-only view of processed NIN records."
+                    desc="Read-only view of bulk NIN records."
                 />
                 <DashboardCard
                     to="/admin/non-pvc"

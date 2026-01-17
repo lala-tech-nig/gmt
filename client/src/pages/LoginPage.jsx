@@ -16,7 +16,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('/api/auth/login', formData);
+            const res = await axios.post('https://gmt-b7oh.onrender.com/api/auth/login', formData);
             if (res.data.success) {
                 // Save token and user info
                 localStorage.setItem('token', res.data.token);

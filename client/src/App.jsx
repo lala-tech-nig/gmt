@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import UploadPage from './pages/admin/UploadPage';
 import NINViewerPage from './pages/admin/NINViewerPage';
+import RegisteredUsersPage from './pages/admin/RegisteredUsersPage';
 import BoardDashboardPage from './pages/admin/BoardDashboardPage';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           {/* Protected Routes */}
           <Route path="admin/dashboard" element={<AdminDashboard />} />
           <Route path="admin/upload" element={<UploadPage />} />
+          <Route path="admin/registrations" element={<RegisteredUsersPage />} />
           <Route path="admin/nins" element={<NINViewerPage />} />
           <Route path="board/dashboard" element={<BoardDashboardPage />} />
           <Route path="admin/non-pvc" element={<h2 className="container">Non-PVC Engagement (Coming Soon)</h2>} />
