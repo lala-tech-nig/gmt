@@ -42,6 +42,7 @@ const RegisteredUsersPage = () => {
                     <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'var(--white)' }}>
                         <thead>
                             <tr style={{ textAlign: 'left', backgroundColor: '#f8f9fa' }}>
+                                <th style={{ padding: '16px', borderBottom: '2px solid #dee2e6' }}>Photo</th>
                                 <th style={{ padding: '16px', borderBottom: '2px solid #dee2e6' }}>Name</th>
                                 <th style={{ padding: '16px', borderBottom: '2px solid #dee2e6' }}>NIN (Masked)</th>
                                 <th style={{ padding: '16px', borderBottom: '2px solid #dee2e6' }}>State/LGA</th>
@@ -60,6 +61,15 @@ const RegisteredUsersPage = () => {
                                     whileHover={{ backgroundColor: '#f1f8f4' }}
                                     onClick={() => setSelectedUser(user)}
                                 >
+                                    <td style={{ padding: '16px' }}>
+                                        {user.imageUrl ? (
+                                            <img src={user.imageUrl} alt="User" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <span style={{ fontSize: '10px' }}>N/A</span>
+                                            </div>
+                                        )}
+                                    </td>
                                     <td style={{ padding: '16px' }}>
                                         <div style={{ fontWeight: '500' }}>{user.surname} {user.firstName}</div>
                                     </td>

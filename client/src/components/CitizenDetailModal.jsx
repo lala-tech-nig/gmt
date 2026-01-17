@@ -55,9 +55,14 @@ const CitizenDetailModal = ({ citizen, onClose }) => {
                             width: '80px', height: '80px',
                             backgroundColor: '#e6f4ea', color: 'var(--primary-color)',
                             borderRadius: '50%', margin: '0 auto 1rem',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            overflow: 'hidden'
                         }}>
-                            <User size={40} />
+                            {citizen.imageUrl ? (
+                                <img src={citizen.imageUrl} alt="Citizen" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                                <User size={40} />
+                            )}
                         </div>
                         <h2 style={{ color: 'var(--primary-color)', margin: 0 }}>
                             {citizen.firstName} {citizen.lastName}

@@ -156,7 +156,7 @@ exports.getRegistrations = async (req, res) => {
         const { limit = 50, page = 1 } = req.query;
 
         const registrations = await Registration.find()
-            .select('-ninHash -imageUrl') // exclude sensitive images/hash if needed
+            .select('-ninHash') // exclude sensitive hash, show image
             .limit(Number(limit))
             .skip((Number(page) - 1) * Number(limit))
             .sort({ createdAt: -1 });
