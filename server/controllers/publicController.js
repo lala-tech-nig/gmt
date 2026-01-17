@@ -1,7 +1,6 @@
 const Registration = require('../models/Registration');
 const crypto = require('crypto');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('../utils/cloudinaryConfig');
 
 // Helper to hash NIN
 const hashNIN = (nin) => {
@@ -39,22 +38,19 @@ exports.registerCitizen = async (req, res) => {
         // If coming from multipart/form-data (file upload)
         let imageUrl = '';
         if (req.file) {
-            imageUrl = req.file.filename;
+            // Cloudinary URL is in req.file.path
+            imageUrl = req.file.path;
         } else if (req.body.imageData) {
             // Handle Base64 (Camera capture often sends base64)
-            // We need to decode and save it
-            const matches = req.body.imageData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-            if (matches && matches.length === 3) {
-                const type = matches[1]; // e.g. image/png
-                const data = Buffer.from(matches[2], 'base64');
-                const ext = type.split('/')[1];
-                const filename = `citizen-${Date.now()}-${Math.round(Math.random() * 1E9)}.${ext}`;
-                const uploadDir = path.join(__dirname, '../uploads/citizens');
-
-                if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-                fs.writeFileSync(path.join(uploadDir, filename), data);
-                imageUrl = filename;
+            try {
+                const uploadResult = await cloudinary.uploader.upload(req.body.imageData, {
+                    folder: 'gmt/citizens',
+                    transformation: [{ width: 800, height: 800, crop: 'limit' }]
+                });
+                imageUrl = uploadResult.secure_url;
+            } catch (uploadError) {
+                console.error('Base64 upload error:', uploadError);
+                return res.status(400).json({ success: false, message: 'Failed to upload image' });
             }
         }
 

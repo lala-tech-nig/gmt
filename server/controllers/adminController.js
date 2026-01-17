@@ -6,6 +6,8 @@ const path = require('path');
 const csv = require('csv-parser');
 const crypto = require('crypto');
 const xlsx = require('xlsx');
+const axios = require('axios');
+const cloudinary = require('../utils/cloudinaryConfig');
 
 // Helper
 const hashNIN = (nin) => crypto.createHash('sha256').update(nin).digest('hex');
@@ -71,32 +73,63 @@ exports.uploadNINs = async (req, res) => {
     }
 
     const results = [];
-    const filePath = req.file.path;
+    // req.file.path contains the Cloudinary URL
+    const cloudinaryUrl = req.file.path;
     const ext = path.extname(req.file.originalname).toLowerCase();
 
+    // Create temp directory if it doesn't exist
+    const tempDir = path.join(__dirname, '../temp');
+    if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    // Download file from Cloudinary to temp location
+    const tempFilePath = path.join(tempDir, `temp-${Date.now()}${ext}`);
+
     try {
+        // Download file from Cloudinary
+        const response = await axios({
+            method: 'GET',
+            url: cloudinaryUrl,
+            responseType: 'stream'
+        });
+
+        const writer = fs.createWriteStream(tempFilePath);
+        response.data.pipe(writer);
+
+        await new Promise((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', reject);
+        });
+
+        // Process the downloaded file
         if (ext === '.csv') {
-            fs.createReadStream(filePath)
+            fs.createReadStream(tempFilePath)
                 .pipe(csv())
                 .on('data', (data) => results.push(data))
                 .on('end', async () => {
-                    await processRecords(results, res, filePath);
+                    await processRecords(results, res, tempFilePath, req.file.public_id);
                 });
         } else if (ext === '.xlsx' || ext === '.xls') {
-            const workbook = xlsx.readFile(filePath);
+            const workbook = xlsx.readFile(tempFilePath);
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
             const jsonData = xlsx.utils.sheet_to_json(sheet);
-            await processRecords(jsonData, res, filePath);
+            await processRecords(jsonData, res, tempFilePath, req.file.public_id);
         }
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Error processing file' });
-        try { fs.unlinkSync(filePath); } catch (e) { }
+        // Cleanup temp file
+        try { fs.unlinkSync(tempFilePath); } catch (e) { }
+        // Delete from Cloudinary
+        if (req.file.public_id) {
+            try { await cloudinary.uploader.destroy(req.file.public_id, { resource_type: 'raw' }); } catch (e) { }
+        }
     }
 };
 
-async function processRecords(data, res, filePath) {
+async function processRecords(data, res, filePath, cloudinaryPublicId) {
     let count = 0;
     let errors = 0;
 
@@ -139,8 +172,17 @@ async function processRecords(data, res, filePath) {
         }
     }
 
-    // Cleanup
+    // Cleanup temp file
     try { fs.unlinkSync(filePath); } catch (e) { }
+
+    // Delete from Cloudinary to save storage space (documents are temporary)
+    if (cloudinaryPublicId) {
+        try {
+            await cloudinary.uploader.destroy(cloudinaryPublicId, { resource_type: 'raw' });
+        } catch (e) {
+            console.error('Error deleting from Cloudinary:', e.message);
+        }
+    }
 
     res.json({
         success: true,
