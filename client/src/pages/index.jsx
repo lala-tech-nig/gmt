@@ -4,7 +4,18 @@ import { motion } from 'framer-motion';
 
 const LandingPage = () => {
     return (
-        <div className="landing-page" style={{ padding: '4rem 0' }}>
+        <div className="landing-page" style={{ padding: '4rem 0', position: 'relative' }}>
+            <div style={{ position: 'absolute', top: '1rem', right: '2rem' }}>
+                <Link to="/login" className="btn" style={{
+                    padding: '8px 16px',
+                    fontSize: '0.85rem',
+                    backgroundColor: 'rgba(0, 135, 83, 0.1)',
+                    color: 'var(--primary-color)',
+                    border: '1px solid var(--primary-color)'
+                }}>
+                    Admin Login
+                </Link>
+            </div>
             <div className="container" style={{ textAlign: 'center' }}>
 
                 <motion.div
