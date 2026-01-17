@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+
 import { BarChart, Users, CheckCircle, XCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const BoardDashboardPage = () => {
     const [stats, setStats] = useState(null);
@@ -10,11 +11,15 @@ const BoardDashboardPage = () => {
         const fetchStats = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('https://gmt-b7oh.onrender.com/api/admin/stats', {
+                const response = await fetch(`${API_BASE_URL}/admin/stats`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                if (res.data.success) {
-                    setStats(res.data.stats);
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    setStats(data.stats);
+                } else {
+                    console.error('Error loading stats:', data.message);
                 }
             } catch (err) {
                 console.error('Error fetching stats:', err);

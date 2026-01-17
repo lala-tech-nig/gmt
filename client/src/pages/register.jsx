@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
 import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import Input from '../components/Input';
 import CameraCapture from '../components/CameraCapture';
 import AnimatedButton from '../components/AnimatedButton';
+import { API_BASE_URL } from '../config';
 
 const STEPS = ['Personal Data', 'Contact Info', 'Address', 'Identity', 'Emergency'];
 
@@ -60,6 +61,11 @@ const RegistrationPage = () => {
             if (formData.nin && formData.nin.length !== 11) newErrors.nin = 'NIN must be 11 digits';
             if (!formData.imageData) newErrors.imageData = 'Image is required';
         }
+        if (step === 4) {
+            if (!formData.emergencyName) newErrors.emergencyName = 'Emergency Contact Name is required';
+            if (!formData.emergencyRel) newErrors.emergencyRel = 'Relationship is required';
+            if (!formData.emergencyPhone) newErrors.emergencyPhone = 'Emergency Contact Phone is required';
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -80,15 +86,31 @@ const RegistrationPage = () => {
         if (validateStep(currentStep)) {
             setIsSubmitting(true);
             try {
-                // Prepare payload
-                const response = await axios.post('https://gmt-b7oh.onrender.com/api/public/register', formData);
+                // Remove imageUrl from formData key collision if it existed, just use imageData
+                const payload = { ...formData };
+                // Ensure backend expects 'imageData' or 'imageUrl'
+                // Based on previous code, backend might expect 'imageUrl' or 'imageData'
+                // The backend controller for 'public/register' handles this.
+                // Assuming it expects the fields directly.
 
-                if (response.data.success) {
+                const response = await fetch(`${API_BASE_URL}/public/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
                     navigate('/success');
+                } else {
+                    throw new Error(data.message || 'Registration failed');
                 }
             } catch (err) {
                 console.error('Registration Error:', err);
-                alert(err.response?.data?.message || 'Registration failed. Please try again.');
+                alert(err.message || 'Registration failed. Please try again.');
             } finally {
                 setIsSubmitting(false);
             }
@@ -224,9 +246,9 @@ const RegistrationPage = () => {
                             {currentStep === 4 && (
                                 <div>
                                     <h3 style={{ marginBottom: '1rem', color: 'var(--text-gray)', fontSize: '1.1rem' }}>Emergency Contact</h3>
-                                    <Input label="Full Name" name="emergencyName" value={formData.emergencyName} onChange={handleChange} />
-                                    <Input label="Relationship" name="emergencyRel" value={formData.emergencyRel} onChange={handleChange} placeholder="e.g. Brother, Wife" />
-                                    <Input label="Contact Number" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} />
+                                    <Input label="Full Name" name="emergencyName" value={formData.emergencyName} onChange={handleChange} error={errors.emergencyName} required />
+                                    <Input label="Relationship" name="emergencyRel" value={formData.emergencyRel} onChange={handleChange} placeholder="e.g. Brother, Wife" error={errors.emergencyRel} required />
+                                    <Input label="Contact Number" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} error={errors.emergencyPhone} required />
                                 </div>
                             )}
                         </motion.div>
